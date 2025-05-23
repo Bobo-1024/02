@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LOL英雄列表</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: url('https://www.loliapi.com/acg/');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      position: relative;
+    }
+    /* iOS风格阴影和动画 */
+    .ios-card {
+      box-shadow: 0 4px 16px 0 rgba(0,0,0,0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .ios-card:active, .ios-card:focus, .ios-card:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px 0 rgba(0,0,0,0.12);
+    }
+    .fade-in {
+      animation: fadeIn 0.6s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0;}
+      to { opacity: 1;}
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-0">
+  <!-- 顶部导航 -->
+  <header class="w-full max-w-xl mx-auto bg-white/80 backdrop-blur rounded-b-3xl shadow-md py-4 px-6 flex items-center justify-between sticky top-0 z-10">
+    <span class="text-xl font-bold text-blue-700">LOL英雄列表</span>
+    <a href="./projects.html" class="text-blue-500 text-sm hover:underline active:opacity-60 transition">返回我的作品</a>
+  </header>
+  <!-- 搜索表单 -->
+  <form id="searchForm" class="w-full max-w-xl mx-auto flex items-center gap-2 px-6 py-4 bg-transparent">
+    <input type="text" id="searchInput" name="q" placeholder="输入英雄名/别名/关键词" class="flex-1 rounded-full border border-blue-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition" />
+    <button type="submit" class="rounded-full bg-blue-500 text-white px-5 py-2 font-semibold shadow hover:bg-blue-600 active:bg-blue-700 transition">搜索</button>
+  </form>
+  <!-- 英雄列表 -->
+  <main class="w-full max-w-xl mx-auto px-4 pb-8">
+    <div id="loading" class="text-center text-blue-400 py-8 hidden">正在加载英雄数据...</div>
+    <div id="error" class="text-center text-red-500 py-8 hidden">加载失败，请稍后重试。</div>
+    <div id="heroList" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
+  </main>
+  <!-- 英雄详情弹窗 -->
+  <div id="modal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl p-6 w-80 shadow-xl relative fade-in">
+      <button id="closeModal" class="absolute top-2 right-2 text-gray-400 hover:text-blue-500 text-xl font-bold">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+  <script>
+    // DOM元素
+    const heroList = document.getElementById('heroList');
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
+
+    // 加载英雄数据
+    async function fetchHeroes(q = '') {
+      loading.style.display = 'block';
+      error.style.display = 'none';
+      heroList.innerHTML = '';
+      try {
+        const url = 'https://api-vue-base.itheima.net/api/lol/search' + (q ? '?q=' + encodeURIComponent(q) : '');
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.code !== 200 || !Array.isArray(data.data)) throw new Error('接口异常');
+        renderHeroes(data.data);
+      } catch (e) {
+        error.style.display = 'block';
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    // 渲染英雄卡片
+    function renderHeroes(heroes) {
+      if (!heroes.length) {
+        heroList.innerHTML = '<div class="col-span-2 sm:col-span-3 text-center text-gray-400 py-8">未找到相关英雄</div>';
+        return;
+      }
+      heroList.innerHTML = heroes.map(hero => `
+        <div class="ios-card bg-white/10 backdrop-blur rounded-2xl p-4 flex flex-col items-center cursor-pointer hover:ring-2 hover:ring-blue-300 transition group" tabindex="0" role="button" aria-label="${hero.title}" onclick="showHeroDetail('${encodeURIComponent(JSON.stringify(hero))}')">
+          <img src="${hero.icon}" alt="${hero.title}" class="w-20 h-20 rounded-full shadow mb-2 object-cover bg-blue-100"/>
+          <div class="font-bold text-blue-700 text-base group-hover:underline">${hero.title}</div>
+          <div class="text-xs text-gray-500 mt-1">${hero.name} (${hero.alias})</div>
+          <div class="flex gap-1 mt-2">
+            ${hero.roles.map(role => `<span class="bg-blue-100 text-blue-500 rounded-full px-2 py-0.5 text-xs">${role}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 英雄详情弹窗
+    window.showHeroDetail = function(heroStr) {
+      const hero = JSON.parse(decodeURIComponent(heroStr));
+      modalContent.innerHTML = `
+        <div class="flex flex-col items-center">
+          <img src="${hero.icon}" alt="${hero.title}" class="w-24 h-24 rounded-full shadow mb-2 object-cover bg-blue-100"/>
+          <div class="font-bold text-blue-700 text-lg mb-1">${hero.title}</div>
+          <div class="text-gray-500 text-sm mb-2">${hero.name} (${hero.alias})</div>
+          <div class="flex gap-2 mb-2">
+            ${hero.roles.map(role => `<span class="bg-blue-100 text-blue-500 rounded-full px-2 py-0.5 text-xs">${role}</span>`).join('')}
+          </div>
+          <div class="text-gray-700 text-sm mb-2">难度：<span class="font-semibold">${hero.difficulty}</span> / 魔法：<span class="font-semibold">${hero.magic}</span></div>
+          <audio controls class="w-full my-2">
+            <source src="${hero.selectAudio}" type="audio/ogg">
+            您的浏览器不支持音频播放。
+          </audio>
+        </div>
+        <form action="confirm.html" method="get" class="mt-4 w-full">
+          <input type="hidden" name="hero" value="${hero.title}">
+          <button type="submit" class="w-full rounded-full bg-blue-500 text-white py-2 font-semibold shadow hover:bg-blue-600 active:bg-blue-700 transition">预约该英雄</button>
+        </form>
+      `;
+      modal.classList.remove('hidden');
+    };
+    closeModal.onclick = () => modal.classList.add('hidden');
+    modal.onclick = e => { if (e.target === modal) modal.classList.add('hidden'); };
+
+    // 搜索表单
+    searchForm.onsubmit = e => {
+      e.preventDefault();
+      fetchHeroes(searchInput.value.trim());
+    };
+
+    // 初始加载
+    fetchHeroes();
+  </script>
+</body>
+</html>
