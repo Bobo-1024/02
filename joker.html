@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日笑话</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      /* iOS风格自定义样式 */
+      .ios-btn {
+        transition: all 0.3s;
+      }
+      .ios-btn:active {
+        transform: scale(0.97);
+        opacity: 0.9;
+      }
+      .joke-card {
+        transition: all 0.3s ease;
+      }
+      .joke-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      /* 加载动画 */
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top-color: #3b82f6;
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+      <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+        <h1 class="text-xl font-semibold text-gray-800">
+          <i class="fas fa-laugh-squint text-yellow-500 mr-2"></i>每日笑话
+        </h1>
+        <a href="#" class="text-blue-500">
+          <i class="fas fa-user-circle text-xl"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="max-w-md mx-auto px-4 py-6">
+      <!-- 按钮区域 -->
+      <div class="flex space-x-4 mb-6">
+        <button id="getSingleJoke" class="ios-btn flex-1 bg-blue-500 text-white text-center py-3 px-4 rounded-xl font-medium shadow-md">
+          <i class="fas fa-grin-squint-tears mr-2"></i>获取一条笑话
+        </button>
+        <button id="getMultipleJokes" class="ios-btn flex-1 bg-green-500 text-white text-center py-3 px-4 rounded-xl font-medium shadow-md">
+          <i class="fas fa-laugh-beam mr-2"></i>获取多条笑话
+        </button>
+      </div>
+
+      <!-- 单条笑话展示区 -->
+      <section id="single-joke" class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+          <i class="fas fa-quote-left text-blue-400 mr-2"></i>
+          单条笑话
+        </h2>
+        <div class="joke-card bg-white rounded-2xl shadow p-5 border border-gray-100">
+          <div class="flex items-start mb-3">
+            <img src="https://www.loliapi.com/acg/pp/" alt="头像" class="w-10 h-10 rounded-full mr-3">
+            <div>
+              <h3 class="font-medium text-gray-800">幽默大师</h3>
+                        <p class="text-xs text-gray-500">刚刚发布</p>
+                    </div>
+                </div>
+                <p id="single-joke-content" class="text-gray-700 leading-relaxed mb-4">
+                    点击上方"获取一条笑话"按钮来加载笑话...
+                </p>
+                <div class="flex justify-between items-center text-gray-500 text-sm">
+                    <div class="flex items-center">
+                        <button class="flex items-center mr-4">
+                            <i class="far fa-heart mr-1"></i> 喜欢
+                        </button>
+                        <button class="flex items-center">
+                            <i class="far fa-comment mr-1"></i> 评论
+                        </button>
+                    </div>
+                    <button>
+                        <i class="fas fa-share-alt"></i> 分享
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 多条笑话展示区 -->
+        <section id="multiple-jokes">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                <i class="fas fa-list-ul text-green-400 mr-2"></i>
+                多条笑话
+            </h2>
+            
+            <div id="jokes-container">
+                <!-- 笑话内容将通过JavaScript动态加载 -->
+                <div class="text-center py-4 text-gray-500">点击上方"获取多条笑话"按钮来加载笑话...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页面底部留白 -->
+    <div class="h-16"></div>
+    
+    <!-- 返回到作品集按钮 -->
+    <div class="fixed bottom-8 left-0 right-0 flex justify-center z-20">
+      <a href="projects.html" class="px-6 py-3 bg-blue-500 text-white rounded-xl shadow-lg hover:bg-blue-700 transition font-semibold">
+        返回作品集
+      </a>
+    </div>
+</body>
+</html>

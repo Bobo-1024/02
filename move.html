@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日励志短句</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* iOS风格自定义样式 */
+        .quote-card {
+            transition: all 0.4s ease;
+            background-image: linear-gradient(to right bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+        
+        .quote-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background-image: linear-gradient(to right bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+        }
+        
+        .quote-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .quote-card:hover .quote-icon {
+            transform: scale(1.2) rotate(10deg);
+            color: #3b82f6;
+        }
+        
+        .quote-text {
+            transition: all 0.3s ease;
+        }
+        
+        .quote-card:hover .quote-text {
+            color: #1e40af;
+        }
+        
+        .bg-pattern {
+            background-image: url('https://www.loliapi.com/acg/');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        /* 加载动画 */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen flex items-center justify-center p-4">
+    <!-- 主要内容区 -->
+    <main class="w-full max-w-md">
+        <!-- 顶部标题 -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white drop-shadow-lg">
+                <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>每日励志
+            </h1>
+            <p class="text-white text-opacity-90 mt-2 drop-shadow-md">点亮你的每一天</p>
+        </header>
+
+        <!-- 励志短句卡片 -->
+        <div id="quote-card" class="quote-card rounded-2xl shadow-xl p-8 mb-6 border border-white border-opacity-30 relative overflow-hidden">
+            <!-- 装饰性引号图标 -->
+            <div class="absolute top-4 left-4 opacity-10">
+                <i class="fas fa-quote-left text-6xl quote-icon"></i>
+            </div>
+            
+            <!-- 短句内容 -->
+            <div class="text-center relative z-10">
+                <p id="quote-text" class="text-xl font-medium text-gray-800 leading-relaxed quote-text">
+                    <span class="loading"></span>
+                </p>
+                
+                <div class="mt-6 flex justify-center items-center">
+                    <div class="w-16 h-0.5 bg-blue-500 rounded-full"></div>
+                </div>
+                
+                <p class="mt-4 text-sm text-gray-600">
+                    — 生活的智慧
+                </p>
+            </div>
+        </div>
+        
+        <!-- 底部操作区 -->
+        <div class="flex justify-center space-x-4">
+            <a href="#" class="px-6 py-3 bg-white bg-opacity-80 rounded-xl text-blue-600 font-medium shadow-md hover:bg-opacity-100 transition duration-300 flex items-center">
+                <i class="fas fa-heart mr-2"></i>
+                收藏
+            </a>
+            <a href="#" class="px-6 py-3 bg-white bg-opacity-80 rounded-xl text-blue-600 font-medium shadow-md hover:bg-opacity-100 transition duration-300 flex items-center">
+                <i class="fas fa-share-alt mr-2"></i>
+                分享
+            </a>
+        </div>
+    </main>
+    
+    <!-- 底部版权信息 -->
+    <footer class="fixed bottom-4 w-full text-center text-white text-opacity-70 text-sm">
+        <p>© 2023 励志短句 · 每日更新</p>
+    </footer>
+
+    <!-- 返回到作品集按钮 -->
+    <div class="fixed bottom-16 left-0 right-0 flex justify-center z-20">
+      <a href="projects.html" class="px-6 py-3 bg-blue-500 text-white rounded-xl shadow-lg hover:bg-blue-700 transition font-semibold">
+        返回作品集
+      </a>
+    </div>
+
+    <!-- JavaScript代码 -->
+    <script>
+        // 获取页面元素
+        const quoteCard = document.getElementById('quote-card');
+        const quoteText = document.getElementById('quote-text');
+        
+        // 显示加载状态
+        function showLoading() {
+            quoteText.innerHTML = '<span class="loading"></span>';
+        }
+        
+        // 获取励志短句
+        async function fetchQuote() {
+            try {
+                // 显示加载状态
+                showLoading();
+                
+                // 发起API请求
+                const response = await fetch('https://hmajax.itheima.net/api/ambition');
+                
+                // 检查响应状态
+                if (!response.ok) {
+                    throw new Error('网络请求失败');
+                }
+                
+                // 获取响应JSON
+                const result = await response.json();
+                
+                // 更新页面内容
+                if (result.message === "获取成功" && result.data) {
+                    quoteText.textContent = result.data;
+                } else {
+                    throw new Error('数据格式错误');
+                }
+            } catch (error) {
+                // 处理错误
+                quoteText.textContent = '获取励志短句失败，请点击重试';
+                console.error('获取励志短句出错:', error);
+            }
+        }
+        
+        // 页面加载时获取一条励志短句
+        document.addEventListener('DOMContentLoaded', fetchQuote);
+        
+        // 点击短句卡片重新获取
+        quoteCard.addEventListener('click', fetchQuote);
+    </script>
+</body>
+</html>
